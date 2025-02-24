@@ -945,8 +945,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 400aa82d186d4b24eba90efb5f8b3349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: 0
-  baseState: 0
+  currentState: 1
+  baseState: 1
   detectionRange: 5
   chaseRange: 10
   movementSpeed: 16
