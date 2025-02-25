@@ -945,11 +945,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 400aa82d186d4b24eba90efb5f8b3349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: 1
+  currentState: 0
   baseState: 1
   detectionRange: 5
   chaseRange: 10
-  movementSpeed: 16
+  attackRange: 1
+  playerPosition: {x: 0, y: 0}
+  playerDistance: 0
+  movementSpeed: 3
   patrolPoints:
   - {fileID: 2006618618}
   - {fileID: 1849170118}
@@ -1053,7 +1056,7 @@ Rigidbody2D:
   m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &2087913038
 BoxCollider2D:
   m_ObjectHideFlags: 0
