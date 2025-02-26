@@ -19,7 +19,6 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        
         rb.linearVelocity = Isometry(moveInput) * moveSpeed;
     }
 
@@ -57,6 +56,15 @@ public class PlayerMovement : MonoBehaviour
     }
 
     public Vector2 GetFacing()
+    {
+        if (isWalking)
+        {
+            return Isometry(moveDirection);
+        }
+        else return Isometry(lastMoveDirection);
+    }
+
+    public Vector2 GetUnalteredFacing()
     {
         if (isWalking)
         {
