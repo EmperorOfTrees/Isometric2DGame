@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements.Experimental;
 
 
 enum EnemyState
@@ -25,7 +26,10 @@ public class BaseEnemy : MonoBehaviour
     private Vector2 playerPosition;
     private float playerDistance;
 
-    [SerializeField] private float movementSpeed = 4f; // maybe one for chase speed as well?
+    [SerializeField] private float currentMovementSpeed = 4f;
+    [SerializeField] private float movementSpeed = 4f;
+    [SerializeField] private float dashSpeed = 8f;
+
     [SerializeField] private List<PatrolPoint> patrolPoints;
 
     private PatrolPoint currentPatrolPoint; // the patrol point the enemy is currently moving towards
@@ -42,6 +46,24 @@ public class BaseEnemy : MonoBehaviour
 
     [SerializeField] private float startWaitTime = 0.5f;
 
+    private Vector2 moveDirection;
+
+
+    [SerializeField] private GameObject AttackTemp;
+
+    private float attackCooldownTime = 0.25f;
+    private float attackCooldownTimer;
+    private bool onAttackCooldown;
+
+
+    private float dashCooldownTime = 3f;
+    private float dashCooldownTimer;
+    private bool onDashCooldown = true;
+
+    private float dashDuration = 1f;
+    private float dashTimer;
+
+
     void Start()
     {
         currentState = baseState;
@@ -57,6 +79,40 @@ public class BaseEnemy : MonoBehaviour
         CheckPlayerDistance();
         StateSwitch();
         StateExecution();
+
+        if (onAttackCooldown)
+        {
+            attackCooldownTimer += Time.deltaTime;
+
+            if (attackCooldownTimer >= attackCooldownTime)
+            {
+                onAttackCooldown = false;
+                attackCooldownTimer = 0;
+            }
+        }
+
+        if (onDashCooldown)
+        {
+            dashCooldownTimer += Time.deltaTime;
+
+            if (dashCooldownTimer >= dashCooldownTime)
+            { 
+                onDashCooldown = false;
+                dashCooldownTimer = 0;
+            }
+        }
+
+        if (!onDashCooldown)
+        {
+            currentMovementSpeed = dashSpeed;
+            dashTimer += Time.deltaTime;
+            if (dashTimer >= dashDuration)
+            {
+                onDashCooldown = true;
+                dashTimer = 0;
+                currentMovementSpeed = movementSpeed;
+            }
+        }
     }
 
     private void StateExecution()
@@ -75,6 +131,7 @@ public class BaseEnemy : MonoBehaviour
                 break;
 
             case EnemyState.Attack:
+                Attack();
                 break;
         }
     }
@@ -127,7 +184,8 @@ public class BaseEnemy : MonoBehaviour
 
     private void Patrol()
     {
-        transform.position = Vector2.MoveTowards(transform.position, currentPatrolPointLocation, movementSpeed * Time.deltaTime);
+        transform.position = Vector2.MoveTowards(transform.position, currentPatrolPointLocation, currentMovementSpeed * Time.deltaTime);
+        moveDirection = (currentPatrolPointLocation - (Vector2)transform.position).normalized;
 
         if (((Vector2)transform.position - currentPatrolPointLocation).magnitude < patrolDistance)
         {
@@ -184,6 +242,17 @@ public class BaseEnemy : MonoBehaviour
 
     private void Chase()
     {
-        transform.position = Vector2.MoveTowards(transform.position, playerPosition, movementSpeed * Time.deltaTime);
+        transform.position = Vector2.MoveTowards(transform.position, playerPosition, currentMovementSpeed * Time.deltaTime);
+        moveDirection = (playerPosition - (Vector2)transform.position).normalized;
+    }
+
+    private void Attack()
+    {
+        if (!onAttackCooldown)
+        {
+            Instantiate(AttackTemp, transform.position + (Vector3)moveDirection, Quaternion.identity);
+            onAttackCooldown = true;
+        }
+
     }
 }
