@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements.Experimental;
 
 
 enum EnemyState
@@ -29,6 +27,7 @@ public class BaseEnemy : MonoBehaviour
     [SerializeField] private float currentMovementSpeed = 4f;
     [SerializeField] private float movementSpeed = 4f;
     [SerializeField] private float dashSpeed = 8f;
+    private Animator animator;
 
     [SerializeField] private List<PatrolPoint> patrolPoints;
 
@@ -63,6 +62,10 @@ public class BaseEnemy : MonoBehaviour
     private float dashDuration = 1f;
     private float dashTimer;
 
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
 
     void Start()
     {
@@ -72,6 +75,8 @@ public class BaseEnemy : MonoBehaviour
         RandomisePatrolPointLocation(currentPatrolPoint.myPosition);
         currentPatrolIndex = 0;
         CheckPlayerDistance();
+
+        animator.SetBool("IsWalking", true);
     }
 
     void Update()
@@ -79,7 +84,15 @@ public class BaseEnemy : MonoBehaviour
         CheckPlayerDistance();
         StateSwitch();
         StateExecution();
+        CheckAttackandDash();
 
+        animator.SetFloat("X", moveDirection.x);
+        animator.SetFloat("Y", moveDirection.y);
+    }
+
+
+    private void CheckAttackandDash()
+    {
         if (onAttackCooldown)
         {
             attackCooldownTimer += Time.deltaTime;
@@ -96,7 +109,7 @@ public class BaseEnemy : MonoBehaviour
             dashCooldownTimer += Time.deltaTime;
 
             if (dashCooldownTimer >= dashCooldownTime)
-            { 
+            {
                 onDashCooldown = false;
                 dashCooldownTimer = 0;
             }

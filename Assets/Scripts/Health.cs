@@ -8,6 +8,10 @@ public class Health : MonoBehaviour
 
     [SerializeField] private HealthBar bar;
 
+    [SerializeField] private float invulnTimer;
+    [SerializeField] private float invulnTime = 0.1f;
+    private bool invuln;
+
     private void Start()
     {
         currentHealth = maxHealth;
@@ -20,11 +24,24 @@ public class Health : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        if (invuln)
+        {
+            invulnTimer += Time.deltaTime;
+            if (invulnTimer >= invulnTime)
+            {
+                invuln = false;
+                invulnTimer = 0;
+            }
+        }
     }
 
     public void TakeDamage(int damage)
     {
-        currentHealth -= damage;
-        bar.takeDamage(damage);
+        if (!invuln)
+        {
+            currentHealth -= damage;
+            bar.takeDamage(damage);
+        }
     }
 }
