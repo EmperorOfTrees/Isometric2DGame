@@ -8,18 +8,23 @@ public class Health : MonoBehaviour
 
     [SerializeField] private HealthBar bar;
 
-    [SerializeField] private float invulnTimer;
     [SerializeField] private float invulnTime = 0.1f;
+
+    private float invulnTimer;
     private bool invuln;
+
+    [SerializeField] private ParticleSystem particles;
 
     private void Start()
     {
+
         currentHealth = maxHealth;
         bar.SetHealth(maxHealth);
     }
 
     private void Update()
     {
+
         if (currentHealth <= 0)
         {
             Destroy(gameObject);
@@ -42,6 +47,7 @@ public class Health : MonoBehaviour
         {
             currentHealth -= damage;
             bar.takeDamage(damage);
+            particles.Play();
         }
     }
 }
